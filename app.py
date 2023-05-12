@@ -6,21 +6,21 @@ def send_message(prompts):
     api_url = "https://api.anthropic.com/v1/complete"
     headers = {
         "Content-Type": "application/json",
-        "X-API-Key": st.secrets["API_KEY"]  # Use the API key from Streamlit's secrets 
+        "X-API-Key": st.secrets["API_KEY"]  
     }
     
-    # Read context from file
-    with open("langchaindocumentation.txt") as f:
-        context = f.read()
+    # Read developer-focused context from file
+    with open("langchain.txt") as f:
+        context = f.read() 
     
-    # Contextualize the prompts 
-    conversation = "\n\n".join([f'{item["role"]}: {item["content"]}' for item in prompts]) + "\n\nAssistant:"   
+    # Update conversation prefix 
+    conversation = "\n\n".join([f'{item["role"]}: {item["content"]}' for item in prompts]) + "\n\nClaude (Developer Assistant):"  
     
     # Define the body of the request 
     body = {
         "prompt": conversation,
-        "model": "claude-v1.3-100k",
-        "context": context,  # Add the context 
+        "model": "claude-v1.3-100k",  # Update model if new version is released
+        "context": context,  
         "max_tokens_to_sample": 1000,
         "stop_sequences": ["\n\nHuman:"]
     }
@@ -30,6 +30,7 @@ def send_message(prompts):
     response.raise_for_status()
     return response.json()
 
+
 # Container for Title and Banner
 with st.container():
     st.title("Chat with Claude")
@@ -38,7 +39,12 @@ with st.container():
 
 # Define initial prompts
 if "prompts" not in st.session_state:
-    st.session_state.prompts = []
+    st.session_state.prompts = [
+        {
+           "role": "Human", 
+           "content": "I'm building an application in Python using langchain and want your advice." 
+        }
+    ] 
 
 # Container for conversation history
 with st.container():
