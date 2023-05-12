@@ -6,24 +6,28 @@ def send_message(prompts):
     api_url = "https://api.anthropic.com/v1/complete"
     headers = {
         "Content-Type": "application/json",
-        "X-API-Key": st.secrets["API_KEY"]  # Use the API key from Streamlit's secrets
+        "X-API-Key": st.secrets["API_KEY"]  # Use the API key from Streamlit's secrets 
     }
-
-    # Prepare the prompts for Claude
-    conversation = "\n\n".join([f'{item["role"]}: {item["content"]}' for item in prompts]) + "\n\nAssistant:"
-
-    # Define the body of the request
+    
+    # Read context from file
+    with open("langchaindocumentation.txt") as f:
+        context = f.read()
+    
+    # Contextualize the prompts 
+    conversation = "\n\n".join([f'{item["role"]}: {item["content"]}' for item in prompts]) + "\n\nAssistant:"   
+    
+    # Define the body of the request 
     body = {
         "prompt": conversation,
         "model": "claude-v1.3-100k",
+        "context": context,  # Add the context 
         "max_tokens_to_sample": 1000,
         "stop_sequences": ["\n\nHuman:"]
     }
-
-    # Make a POST request to the Claude API
+    
+    # Make a POST request to the Claude API 
     response = requests.post(api_url, headers=headers, data=json.dumps(body))
     response.raise_for_status()
-
     return response.json()
 
 # Container for Title and Banner
